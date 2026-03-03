@@ -9,12 +9,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import javax.servlet.http.HttpSession;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-
-
 
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
@@ -23,8 +20,7 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        try {
-            Connection con = DBConnection.getConnection();
+        try (Connection con = DBConnection.getConnection()) {
 
             String sql = "SELECT * FROM users WHERE username=? AND password=?";
             PreparedStatement ps = con.prepareStatement(sql);
@@ -41,7 +37,13 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect("dashboard.jsp");
 
             } else {
-                response.sendRedirect("login.jsp?error=true");
+
+                // 🔴 Set error message
+                request.setAttribute("error", "Invalid username or password");
+
+                // 🔴 Forward back to login page
+                request.getRequestDispatcher("login.jsp")
+                        .forward(request, response);
             }
 
         } catch (Exception e) {

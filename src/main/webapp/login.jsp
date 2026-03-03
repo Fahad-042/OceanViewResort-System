@@ -5,30 +5,44 @@
     <title>Login - Ocean View Resort</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light d-flex justify-content-center align-items-center vh-100">
 
-<div class="card shadow-lg p-4" style="width: 400px;">
+<div class="card shadow-lg p-4" style="width: 400px; border-radius: 15px;">
 
     <h3 class="text-center text-primary mb-4">
-        Ocean View Resort Login
+            Ocean View Resort Login
     </h3>
 
-    <% if (request.getAttribute("error") != null) { %>
-    <div class="alert alert-danger">
-        <%= request.getAttribute("error") %>
+    <!-- Error Message -->
+    <%
+        String error = (String) request.getAttribute("error");
+        if (error != null) {
+    %>
+    <div class="alert alert-danger text-center">
+        <%= error %>
     </div>
-    <% } %>
+    <%
+        }
+    %>
 
     <form action="login" method="post">
 
         <div class="mb-3">
             <label class="form-label">Username</label>
-            <input type="text" name="username" class="form-control" required minlength="3">
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>"
+                   required minlength="3">
         </div>
 
         <div class="mb-3">
             <label class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" required minlength="3">
+            <input type="password"
+                   name="password"
+                   class="form-control"
+                   required minlength="3">
         </div>
 
         <button type="submit" class="btn btn-primary w-100">

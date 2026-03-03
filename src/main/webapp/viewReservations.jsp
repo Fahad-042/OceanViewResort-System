@@ -1,12 +1,11 @@
-<%@ page import="java.sql.*" %>
-<%@ page import="com.oceanview.util.DBConnection" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.example.oceanviewresort.model.Reservation" %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>View Reservations</title>
-    <th>Action</th>
 </head>
 
 <%
@@ -15,6 +14,7 @@
         return;
     }
 %>
+
 <body>
 <div class="container mt-4">
 
@@ -27,53 +27,57 @@
             <th>Guest Name</th>
             <th>Contact</th>
             <th>Room Type</th>
+            <th>Address</th>
             <th>Check-in</th>
             <th>Check-out</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
+        <%
+            List<Reservation> reservations =
+                    (List<Reservation>) request.getAttribute("reservations");
 
-    <%
-        ResultSet rs = (ResultSet) request.getAttribute("reservations");
-        while (rs.next()) {
-    %>
-    <tr>
-        <td><%= rs.getInt("reservation_id") %></td>
-        <td><%= rs.getString("guest_name") %></td>
-        <td><%= rs.getString("contact_number") %></td>
-        <td><%= rs.getString("room_type") %></td>
-        <td><%= rs.getDate("check_in_date") %></td>
-        <td><%= rs.getDate("check_out_date") %></td>
-        <td>
-            <a class="btn btn-sm btn-primary"
-               href="editReservation?id=<%= rs.getInt("reservation_id") %>">
-                Edit
-            </a>
+            if (reservations != null) {
+                for (Reservation r : reservations) {
+        %>
+        <tr>
+            <td><%= r.getId() %></td>
+            <td><%= r.getGuestName() %></td>
+            <td><%= r.getContact() %></td>
+            <td><%= r.getRoomType() %></td>
+            <td><%= r.getAddress() %></td>
+            <td><%= r.getCheckInDate() %></td>
+            <td><%= r.getCheckOutDate() %></td>
+            <td>
+                <a class="btn btn-sm btn-primary"
+                   href="editReservation?id=<%= r.getId() %>">
+                    Edit
+                </a>
 
-            <a class="btn btn-sm btn-danger"
-               href="deleteReservation?id=<%= rs.getInt("reservation_id") %>">
-                Delete
-            </a>
+                <a class="btn btn-sm btn-danger"
+                   href="deleteReservation?id=<%= r.getId() %>">
+                    Delete
+                </a>
 
-            <a class="btn btn-sm btn-success"
-               href="bill?id=<%= rs.getInt("reservation_id") %>">
-                Bill
-            </a>
-        </td>
-    </tr>
-    <%
-        }
-    %>
-</table>
+                <a class="btn btn-sm btn-success"
+                   href="bill?id=<%= r.getId() %>">
+                    Bill
+                </a>
+            </td>
+        </tr>
+        <%
+                }
+            }
+        %>
+
+        </tbody>
+    </table>
+
+    <a href="dashboard.jsp" class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
 
 </div>
-
-<br>
-
-<a href="dashboard.jsp" class="btn btn-secondary mt-3">
-    Back to Dashboard
-</a>
-
 </body>
 </html>
