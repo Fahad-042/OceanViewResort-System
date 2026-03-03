@@ -1,71 +1,72 @@
 package com.example.oceanviewresort;
 
-import com.oceanview.util.DBConnection;
+import com.example.oceanviewresort.dao.ReservationDAO;
+import com.example.oceanviewresort.dao.ReservationDAOImpl;
+
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import javax.servlet.ServletException;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @WebServlet("/addReservation")
 public class AddReservationServlet extends HttpServlet {
 
+    private ReservationDAO dao = new ReservationDAOImpl();
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("addReservation.jsp").forward(request, response);
+        request.getRequestDispatcher("addReservation.jsp")
+                .forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
             throws ServletException, IOException {
 
-        String guestName = request.getParameter("guest_name");
-        String address = request.getParameter("address");
-        String contact = request.getParameter("contact_number");
-        String roomType = request.getParameter("room_type");
-        String checkIn = request.getParameter("check_in");
-        String checkOut = request.getParameter("check_out");
-
-
-        // Contact number validation
-        if (!contact.matches("\\d{10}")) {
-            response.getWriter().println("Invalid Contact Number! Must be 10 digits.");
-            return;
-        }
-
-// Date validation
-        LocalDate inDate = LocalDate.parse(checkIn);
-        LocalDate outDate = LocalDate.parse(checkOut);
-
-        long nights = ChronoUnit.DAYS.between(inDate, outDate);
-
-        if (nights <= 0) {
-            response.getWriter().println("Check-out date must be after check-in date.");
-            return;
-        }
-
         try {
-            Connection con = DBConnection.getConnection();
+            String guestName = request.getParameter("guest_name");
+            String address = request.getParameter("address");
+            String contact = request.getParameter("contact_number");
+            String roomType = request.getParameter("room_type");
 
-            String sql = "INSERT INTO reservation " +
-                    "(guest_name, address, contact_number, room_type, check_in_date, check_out_date) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            LocalDate checkIn = LocalDate.parse(request.getParameter("check_in"));
+            LocalDate checkOut = LocalDate.parse(request.getParameter("check_out"));
 
-            PreparedStatement ps = con.prepareStatement(sql);
+            // Preserve values on error
+            request.setAttribute("guest_name", guestName);
+            request.setAttribute("address", address);
+            request.setAttribute("contact_number", contact);
+            request.setAttribute("room_type", roomType);
+            request.setAttribute("check_in", checkIn);
+            request.setAttribute("check_out", checkOut);
 
-            ps.setString(1, guestName);
-            ps.setString(2, address);
-            ps.setString(3, contact);
-            ps.setString(4, roomType);
-            ps.setString(5, checkIn);
-            ps.setString(6, checkOut);
+            // Contact validation
+            if (!contact.matches("\\d{10}")) {
+                request.setAttribute("error",
+                        "Invalid Contact Number! Must be exactly 10 digits.");
+                request.getRequestDispatcher("addReservation.jsp")
+                        .forward(request, response);
+                return;
+            }
 
-            ps.executeUpdate();
+
+
+            // Date validation
+            if (!checkOut.isAfter(checkIn)) {
+                request.setAttribute("error",
+                        "Check-out date must be after the check-in date.");
+                request.getRequestDispatcher("addReservation.jsp")
+                        .forward(request, response);
+                return;
+            }
+
+            dao.addReservation(guestName, address, contact,
+                    roomType, checkIn, checkOut);
 
             response.sendRedirect("viewReservations");
 

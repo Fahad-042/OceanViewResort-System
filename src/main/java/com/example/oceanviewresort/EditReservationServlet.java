@@ -1,72 +1,87 @@
 package com.example.oceanviewresort;
 
-import com.oceanview.util.DBConnection;
+import com.example.oceanviewresort.dao.ReservationDAO;
+import com.example.oceanviewresort.dao.ReservationDAOImpl;
+import com.example.oceanviewresort.model.Reservation;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.*;
+import java.time.LocalDate;
 
 @WebServlet("/editReservation")
 public class EditReservationServlet extends HttpServlet {
 
+    private ReservationDAO dao = new ReservationDAOImpl();
+
+    // ===============================
+    // LOAD DATA INTO EDIT FORM
+    // ===============================
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int id = Integer.parseInt(request.getParameter("id"));
-
         try {
-            Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(
-                    "SELECT * FROM reservation WHERE reservation_id=?");
-            ps.setInt(1, id);
+            int id = Integer.parseInt(request.getParameter("id"));
+            Reservation reservation = dao.getReservationById(id);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                request.setAttribute("id", rs.getInt("reservation_id"));
-                request.setAttribute("guest_name", rs.getString("guest_name"));
-                request.setAttribute("address", rs.getString("address"));
-                request.setAttribute("contact_number", rs.getString("contact_number"));
-                request.setAttribute("room_type", rs.getString("room_type"));
-                request.setAttribute("check_in_date", rs.getDate("check_in_date"));
-                request.setAttribute("check_out_date", rs.getDate("check_out_date"));
-
-                request.getRequestDispatcher("editReservation.jsp")
-                        .forward(request, response);
+            if (reservation == null) {
+                response.getWriter().println("Reservation not found");
+                return;
             }
+
+            request.setAttribute("reservation", reservation);
+            request.getRequestDispatcher("editReservation.jsp")
+                    .forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // ===============================
+    // UPDATE DATA
+    // ===============================
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int id = Integer.parseInt(request.getParameter("id"));
-        String guestName = request.getParameter("guest_name");
-        String address = request.getParameter("address");
-        String contact = request.getParameter("contact_number");
-        String roomType = request.getParameter("room_type");
-        String checkIn = request.getParameter("check_in_date");
-        String checkOut = request.getParameter("check_out_date");
-
         try {
-            Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE reservation SET guest_name=?, address=?, contact_number=?, room_type=?, check_in_date=?, check_out_date=? WHERE reservation_id=?");
+            int id = Integer.parseInt(request.getParameter("id"));
 
-            ps.setString(1, guestName);
-            ps.setString(2, address);
-            ps.setString(3, contact);
-            ps.setString(4, roomType);
-            ps.setString(5, checkIn);
-            ps.setString(6, checkOut);
-            ps.setInt(7, id);
+            String guestName = request.getParameter("guest_name");
+            String address = request.getParameter("address");
+            String contact = request.getParameter("contact"); // ✅ FIXED
+            String roomType = request.getParameter("room_type");
 
-            ps.executeUpdate();
+            LocalDate checkIn =
+                    LocalDate.parse(request.getParameter("check_in_date"));
+            LocalDate checkOut =
+                    LocalDate.parse(request.getParameter("check_out_date"));
 
+            Reservation reservation = dao.getReservationById(id);
+
+            // CONTACT VALIDATION
+            if (!contact.matches("\\d{10}")) {
+                request.setAttribute("error", "Invalid Contact Number! Must be 10 digits.");
+                request.setAttribute("reservation", reservation);
+                request.getRequestDispatcher("editReservation.jsp").forward(request, response);
+                return;
+            }
+
+            // DATE VALIDATION
+            if (!checkOut.isAfter(checkIn)) {
+                request.setAttribute("error", "Check-out date must be after check-in date.");
+                request.setAttribute("reservation", reservation);
+                request.getRequestDispatcher("editReservation.jsp").forward(request, response);
+                return;
+            }
+
+            dao.updateReservation(id, guestName, address, contact,
+                    roomType, checkIn, checkOut);
+
+            // ✅ SUCCESS → GO BACK TO LIST
             response.sendRedirect("viewReservations");
 
         } catch (Exception e) {

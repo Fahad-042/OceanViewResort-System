@@ -1,26 +1,25 @@
 package com.example.oceanviewresort;
 
-import com.oceanview.util.DBConnection;
+import com.example.oceanviewresort.dao.ReservationDAO;
+import com.example.oceanviewresort.dao.ReservationDAOImpl;
+
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import javax.servlet.*;
 import java.io.IOException;
-import java.sql.*;
 
 @WebServlet("/deleteReservation")
 public class DeleteReservationServlet extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         int id = Integer.parseInt(request.getParameter("id"));
 
         try {
-            Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(
-                    "DELETE FROM reservation WHERE reservation_id = ?");
-            ps.setInt(1, id);
-            ps.executeUpdate();
+            ReservationDAO dao = new ReservationDAOImpl();
+            dao.deleteReservation(id);
 
             response.sendRedirect("viewReservations");
 

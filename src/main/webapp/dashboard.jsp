@@ -10,7 +10,7 @@
 
     <style>
         body {
-            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            background: linear-gradient(135deg, #ffffff, #fbfffc);
             min-height: 100vh;
         }
 
@@ -41,29 +41,29 @@
     <div class="dashboard-card text-center">
 
         <h2 class="dashboard-title mb-4">
-            🌊 Ocean View Resort Admin Dashboard
+            Ocean View Resort Admin Dashboard
         </h2>
 
         <p class="mb-4 text-muted">
             Manage reservations, calculate bills and control the system securely.
         </p>
 
-        <div class="d-grid gap-3">
+        <div class="d-grid gap-2">
 
-            <a href="addReservation.jsp" class="btn btn-success btn-custom">
-                ➕ Add New Reservation
+            <a href="addReservation.jsp" class="btn btn-success btn-lg">
+                 Add New Reservation
             </a>
 
-            <a href="viewReservations" class="btn btn-primary btn-custom">
-                📋 View Reservations
+            <a href="viewReservations" class="btn btn-primary btn-lg">
+                 View Reservations
             </a>
 
-            <a href="help.jsp" class="btn btn-secondary btn-custom">
-                ❓ Help Section
+            <a href="help.jsp" class="btn btn-secondary btn-lg">
+                 Help Section
             </a>
 
-            <a href="logout" class="btn btn-danger btn-custom">
-                🔓 Logout
+            <a href="logout" class="btn btn-danger btn-lg">
+                 Logout
             </a>
 
         </div>

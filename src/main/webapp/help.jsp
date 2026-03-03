@@ -35,13 +35,13 @@
 
 <div class="box">
 
-    <h2>1️⃣ Login</h2>
+    <h2>1 Login</h2>
     <ul>
         <li>Enter your username and password.</li>
         <li>Click the Login button to access the system.</li>
     </ul>
 
-    <h2>2️⃣ Add New Reservation</h2>
+    <h2>2️ Add New Reservation</h2>
     <ul>
         <li>Click "Add Reservation" from the dashboard.</li>
         <li>Enter guest details (name, address, contact).</li>
@@ -50,20 +50,20 @@
         <li>Click "Add Reservation" to save.</li>
     </ul>
 
-    <h2>3️⃣ View Reservations</h2>
+    <h2>3️ View Reservations</h2>
     <ul>
         <li>Click "View Reservations" from dashboard.</li>
         <li>All reservations will be displayed in table format.</li>
         <li>You can Edit or Delete reservations.</li>
     </ul>
 
-    <h2>4️⃣ Calculate Bill</h2>
+    <h2>4️ Calculate Bill</h2>
     <ul>
         <li>Click "Bill" next to a reservation.</li>
         <li>The system calculates total nights and total amount automatically.</li>
     </ul>
 
-    <h2>5️⃣ Logout / Exit</h2>
+    <h2>5️ Logout / Exit</h2>
     <ul>
         <li>Click Logout to safely exit the system.</li>
         <li>Your session will be closed securely.</li>
