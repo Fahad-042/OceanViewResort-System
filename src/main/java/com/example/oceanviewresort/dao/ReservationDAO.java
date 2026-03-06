@@ -12,7 +12,7 @@ public interface ReservationDAO {
                         String roomType,
                         LocalDate checkIn,
                         LocalDate checkOut) throws Exception;
-
+    // Insert reservation record into database
     void deleteReservation(int id) throws Exception;
 
     Reservation getReservationById(int id) throws Exception;
